@@ -25,7 +25,7 @@ class SnakeGame {
         jf.setBackground(Color.yellow);
         jf.setResizable(false);
         jf.setVisible(true);
-		jf.setLocationRelativeTo(null);
+		jf.setRelativeLocation(null);
         jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
     public static void main(String[] args) {

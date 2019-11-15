@@ -1,0 +1,7 @@
+class GamePlayPanel 
+{
+	public static void main(String[] args) 
+	{
+		
+	}
+}
