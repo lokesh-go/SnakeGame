@@ -37,12 +37,13 @@ public class SnakeGame extends javax.swing.JFrame implements KeyListener, Action
     Timer timer;
     public SnakeGame() {
         initComponents();
+        
         addKeyListener(this);
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
         
         timer = new Timer(100, this);
-        //timer.start();
+        timer.start();
 
         setLocationRelativeTo(null);
     }
@@ -205,7 +206,8 @@ public class SnakeGame extends javax.swing.JFrame implements KeyListener, Action
 
     @Override
     public void keyTyped(KeyEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
+        
     }
 
     @Override
@@ -291,17 +293,109 @@ public class SnakeGame extends javax.swing.JFrame implements KeyListener, Action
             
         }
         
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
         
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
+        
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        timer.start();
+        if(right){
+            for(int r = lengthofsnake-1; r>=0; r-- )
+            {
+                snakeYlength[r+1] = snakeYlength[r];   // move the value of y indexes ....
+            }
+            for(int r = lengthofsnake; r>=0 ; r--){
+                if(r == 0)
+                {
+                    snakeXlength[r] = snakeXlength[r] + 25; //  snake head move with 25 value ahead ....
+                    
+                }
+                else
+                {
+                    snakeXlength[r] = snakeXlength[r-1]; // shifting snake body value further ....
+                }
+                if(snakeXlength[r] > 725)
+                {
+                    snakeXlength[r] = 0;
+                }
+            }
+            repaint();
+        }
+        if(left){
+                for(int r = lengthofsnake-1; r>=0; r-- )
+                {
+                    snakeYlength[r+1] = snakeYlength[r];   // move the value of y indexes ....
+                }
+                for(int r = lengthofsnake; r>=0 ; r--){
+                    if(r == 0)
+                    {
+                        snakeXlength[r] = snakeXlength[r] - 25; //  snake head move with 25 value ahead ....
+                    }
+                    else
+                    {
+                        snakeXlength[r] = snakeXlength[r-1]; //  shifting snake body value further ....
+                    }
+                    if(snakeXlength[r] < 0)
+                    {
+                        snakeXlength[r] = 725;
+                    }
+                }
+                repaint();
+        }
+        if(up)
+        {
+            for(int r = lengthofsnake-1; r>=0; r-- )
+                {
+                    snakeXlength[r+1] = snakeXlength[r];   //   move the value of y indexes ....
+                }
+                for(int r = lengthofsnake; r>=0 ; r--){
+                    if(r == 0)
+                    {
+                        snakeYlength[r] = snakeYlength[r] - 25; //  snake head move with 25 value ahead ....
+
+                    }
+                    else
+                    {
+                        snakeYlength[r] = snakeYlength[r-1]; //  shifting snake body value further ....
+                    }
+                    if(snakeYlength[r] < 0)
+                    {
+                        snakeYlength[r] = 525;
+                    }
+                }
+                repaint();
+            
+        }
+        if(down)
+        {
+                for(int r = lengthofsnake-1; r>=0; r-- )
+                {
+                    snakeXlength[r+1] = snakeXlength[r];   // move the value of y indexes ....
+                }
+                for(int r = lengthofsnake; r>=0 ; r--){
+                    if(r == 0)
+                    {
+                        snakeYlength[r] = snakeYlength[r] + 25; //  snake head move with 25 value ahead ....
+
+                    }
+                    else
+                    {
+                        snakeYlength[r] = snakeYlength[r-1]; // shifting snake body value further ....
+                    }
+                    if(snakeYlength[r] > 525)
+                    {
+                        snakeYlength[r] = 0;
+                    }
+                }
+                repaint();
+        }
+        
     }
 }
