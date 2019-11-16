@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.net.URL;
+import java.util.Random;
 import javax.swing.ImageIcon;
 import javax.swing.Timer;
 
@@ -34,15 +35,30 @@ public class SnakeGame extends javax.swing.JFrame implements KeyListener, Action
     
     private ImageIcon rigthmouth,leftmouth,upmouth,downmouth,snakeimage; // after key pressed snake move action changed
     private int lengthofsnake = 3, moves = 0;
+    private int [] enemyXpos = {25,50,75,100,125,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700,725};
+    private int [] enemyYpos = {25,50,75,100,125,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525};
+    
+    private ImageIcon enemyimage;
+    
+    private Random random = new Random();
+    private int xpos = random.nextInt(29);
+    private int ypos = random.nextInt(21);
+    private int score = 0;
+    private int snakeSpeed = 80;
     Timer timer;
     public SnakeGame() {
         initComponents();
+        
+        gameoverlabel.setVisible(false);
+        highscorelabel.setVisible(false);
+        highscorebox.setVisible(false);
+        restartmsglabel.setVisible(false);
         
         addKeyListener(this);
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
         
-        timer = new Timer(100, this);
+        timer = new Timer(snakeSpeed, this);
         timer.start();
 
         setLocationRelativeTo(null);
@@ -52,6 +68,7 @@ public class SnakeGame extends javax.swing.JFrame implements KeyListener, Action
     public void ourCustomPaintingMethod(Graphics g)
     {   
         if(moves == 0){
+            
             snakeXlength[0] = 100;
             snakeXlength[1] = 75;
             snakeXlength[2] = 50;
@@ -67,6 +84,7 @@ public class SnakeGame extends javax.swing.JFrame implements KeyListener, Action
         URL uurl = getClass().getResource("/snakegame/images/upmouth.png");
         URL durl = getClass().getResource("/snakegame/images/downmouth.png");
         URL snk = getClass().getResource("/snakegame/images/snakeimage.png");
+        URL ene = getClass().getResource("/snakegame/images/enemy.png");
         
         rigthmouth = new ImageIcon(rurl);
         rigthmouth.paintIcon(this, g, snakeXlength[0], snakeYlength[0]);
@@ -99,7 +117,34 @@ public class SnakeGame extends javax.swing.JFrame implements KeyListener, Action
             
         }
         
+        enemyimage = new ImageIcon(ene);
+        if((enemyXpos[xpos] == snakeXlength[0] && enemyYpos[ypos] == snakeYlength[0]))
+        {
+            score += 10;
+            scorebox.setText(Integer.toString(score));
+            lengthofsnake++;
+            xpos = random.nextInt(29);
+            ypos = random.nextInt(21);
+        }
         
+        enemyimage.paintIcon(this, g, enemyXpos[xpos], enemyYpos[ypos]);
+        
+        for(int check = 1; check < lengthofsnake; check++)
+        {
+            if(snakeXlength[check] == snakeXlength[0] && snakeYlength[check] == snakeYlength[0])
+            {
+                right = false;
+                left = false;
+                up = false;
+                down = false;
+                
+                highscorebox.setText(Integer.toString(score));
+                gameoverlabel.setVisible(true);
+                highscorelabel.setVisible(true);
+                highscorebox.setVisible(true);
+                restartmsglabel.setVisible(true);
+            }
+        }
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -113,6 +158,8 @@ public class SnakeGame extends javax.swing.JFrame implements KeyListener, Action
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        scorebox = new javax.swing.JTextField();
         jPanel3 = new javax.swing.JPanel()
         {
             public void paint(Graphics g)
@@ -121,39 +168,66 @@ public class SnakeGame extends javax.swing.JFrame implements KeyListener, Action
                 ourCustomPaintingMethod(g);
             }
         };
+        gameoverlabel = new javax.swing.JLabel();
+        highscorelabel = new javax.swing.JLabel();
+        highscorebox = new javax.swing.JTextField();
+        restartmsglabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(0, 0, 0));
         setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jPanel1.setBackground(new java.awt.Color(102, 102, 102));
+        jPanel1.setBackground(new java.awt.Color(51, 51, 51));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jPanel2.setBackground(new java.awt.Color(51, 51, 51));
-        jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanel2.setBackground(new java.awt.Color(0, 0, 0));
+        jPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(255, 153, 51), new java.awt.Color(255, 153, 51), new java.awt.Color(255, 153, 51), new java.awt.Color(255, 153, 51)));
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setFont(new java.awt.Font("HP Simplified Light", 1, 28)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(51, 255, 51));
+        jLabel1.setForeground(new java.awt.Color(255, 153, 0));
         jLabel1.setText("Snake Game");
         jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 10, 170, 40));
+
+        jLabel3.setFont(new java.awt.Font("HP Simplified Light", 1, 18)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(51, 255, 51));
+        jLabel3.setText("Score :");
+        jPanel2.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 20, 60, 20));
+
+        scorebox.setBackground(new java.awt.Color(0, 0, 0));
+        scorebox.setFont(new java.awt.Font("HP Simplified Light", 0, 30)); // NOI18N
+        scorebox.setForeground(new java.awt.Color(255, 255, 51));
+        scorebox.setText("0");
+        scorebox.setBorder(null);
+        jPanel2.add(scorebox, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 10, 100, 40));
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 750, 60));
 
         jPanel3.setBackground(new java.awt.Color(0, 0, 0));
-        jPanel3.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(51, 255, 51), new java.awt.Color(51, 255, 51), new java.awt.Color(102, 255, 51), new java.awt.Color(51, 255, 51)));
+        jPanel3.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(51, 102, 255), new java.awt.Color(51, 102, 255), new java.awt.Color(51, 102, 255), new java.awt.Color(51, 102, 255)));
+        jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 746, Short.MAX_VALUE)
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 546, Short.MAX_VALUE)
-        );
+        gameoverlabel.setFont(new java.awt.Font("Comic Sans MS", 1, 60)); // NOI18N
+        gameoverlabel.setForeground(new java.awt.Color(255, 255, 255));
+        gameoverlabel.setText("Game Over");
+        jPanel3.add(gameoverlabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 180, 330, 60));
+
+        highscorelabel.setFont(new java.awt.Font("HP Simplified Light", 1, 24)); // NOI18N
+        highscorelabel.setForeground(new java.awt.Color(204, 204, 204));
+        highscorelabel.setText("High Score : ");
+        jPanel3.add(highscorelabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 250, -1, -1));
+
+        highscorebox.setBackground(new java.awt.Color(0, 0, 0));
+        highscorebox.setFont(new java.awt.Font("HP Simplified Light", 0, 32)); // NOI18N
+        highscorebox.setForeground(new java.awt.Color(51, 255, 51));
+        highscorebox.setBorder(null);
+        jPanel3.add(highscorebox, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 250, 120, 30));
+
+        restartmsglabel.setFont(new java.awt.Font("HP Simplified Light", 1, 24)); // NOI18N
+        restartmsglabel.setForeground(new java.awt.Color(255, 255, 51));
+        restartmsglabel.setText("press   SPACE  button to restart Game");
+        jPanel3.add(restartmsglabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 300, -1, -1));
 
         jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 750, 550));
 
@@ -198,10 +272,16 @@ public class SnakeGame extends javax.swing.JFrame implements KeyListener, Action
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel gameoverlabel;
+    private javax.swing.JTextField highscorebox;
+    private javax.swing.JLabel highscorelabel;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JLabel restartmsglabel;
+    private javax.swing.JTextField scorebox;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -212,6 +292,20 @@ public class SnakeGame extends javax.swing.JFrame implements KeyListener, Action
 
     @Override
     public void keyPressed(KeyEvent e) {
+        
+        if(e.getKeyCode() == KeyEvent.VK_SPACE)
+        {
+            moves = 0;
+            score = 0;
+            lengthofsnake = 3;
+            
+            gameoverlabel.setVisible(false);
+            highscorelabel.setVisible(false);
+            highscorebox.setVisible(false);
+            restartmsglabel.setVisible(false);
+            
+            repaint();
+        }
         if(e.getKeyCode() == KeyEvent.VK_RIGHT){
             moves++;
             right = true;
