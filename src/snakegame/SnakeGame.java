@@ -49,9 +49,7 @@ public class SnakeGame extends javax.swing.JFrame implements KeyListener, Action
 
     
     public void ourCustomPaintingMethod(Graphics g)
-    {
-        //super.paintComponents(g);
-        
+    {   
         if(moves == 0){
             snakeXlength[0] = 100;
             snakeXlength[1] = 75;
@@ -212,7 +210,89 @@ public class SnakeGame extends javax.swing.JFrame implements KeyListener, Action
 
     @Override
     public void keyPressed(KeyEvent e) {
+        if(e.getKeyCode() == KeyEvent.VK_RIGHT){
+            moves++;
+            right = true;
+            
+            // preventing to colide .....
+            
+            if(!left){
+                right = true;
+            }
+            else
+            {
+                right = false;
+                left = true;
+            }
+            
+ 
+            up = false;
+            down = false;
+            
+        }
+        if(e.getKeyCode() == KeyEvent.VK_LEFT){
+            moves++;
+            left = true;
+            
+            // preventing to colide .....
+            
+            if(!right){
+                left = true;
+            }
+            else
+            {
+                left = false;
+                right = true;
+            }
+            
+ 
+            up = false;
+            down = false;
+            
+        }
+        if(e.getKeyCode() == KeyEvent.VK_UP){
+            moves++;
+            up = true;
+            
+            // preventing to colide .....
+            
+            if(!down){
+                up = true;
+            }
+            else
+            {
+                up = false;
+                down = true;
+            }
+            
+ 
+            left = false;
+            right = false;
+            
+        }
+        if(e.getKeyCode() == KeyEvent.VK_DOWN){
+            moves++;
+            down = true;
+            
+            // preventing to colide .....
+            
+            if(!up){
+                down = true;
+            }
+            else
+            {
+                down = false;
+                up = true;
+            }
+            
+ 
+            left = false;
+            right = false;
+            
+        }
+        
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
     }
 
     @Override
