@@ -11,7 +11,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.net.URL;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Random;
+import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.Timer;
 
@@ -45,9 +51,28 @@ public class SnakeGame extends javax.swing.JFrame implements KeyListener, Action
     private int ypos = random.nextInt(21);
     private int score = 0;
     private int snakeSpeed = 80;
+    
     Timer timer;
+    java.util.Timer ti;
+    
+    TimerTask tti;
+    
     public SnakeGame() {
         initComponents();
+        MakeOffline mo = new MakeOffline();
+        System.out.println("status : "+playstatusbox.getText());
+        if("Single Play".equals(Welcome.playstatus)){
+            player2box.setVisible(false);
+            scorebox2.setVisible(false);
+            System.out.println("hide");
+        }
+        else
+        {
+            player2box.setVisible(true);
+            scorebox2.setVisible(true);
+            friends_score();
+        }
+        
         
         gameoverlabel.setVisible(false);
         highscorelabel.setVisible(false);
@@ -64,7 +89,35 @@ public class SnakeGame extends javax.swing.JFrame implements KeyListener, Action
         setLocationRelativeTo(null);
     }
 
-    
+    public void friends_score()
+    {
+        try {
+            System.out.println("Friends : "+MultiPlay.s);
+            MySql mysql = new MySql();
+            String sql = "select tempscore from info where userid = '"+MultiPlay.s+"'";
+            PreparedStatement pstmt = mysql.conn.prepareStatement(sql);
+            
+            ti = new java.util.Timer();
+            ti.schedule(tti = new TimerTask()
+            {
+                public void run()
+                {
+                    String fval="";
+                    try {
+                        ResultSet rs = pstmt.executeQuery();
+                        while(rs.next()){
+                            fval = rs.getString(1);
+                        }
+                        scorebox2.setText(fval);
+                    } catch (SQLException ex) {
+                        Logger.getLogger(SnakeGame.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            },0, 2000);
+        } catch (SQLException ex) {
+            Logger.getLogger(SnakeGame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     public void ourCustomPaintingMethod(Graphics g)
     {   
         if(moves == 0){
@@ -121,7 +174,12 @@ public class SnakeGame extends javax.swing.JFrame implements KeyListener, Action
         if((enemyXpos[xpos] == snakeXlength[0] && enemyYpos[ypos] == snakeYlength[0]))
         {
             score += 10;
+            if("Single Play".equals(Welcome.playstatus)){
             scorebox.setText(Integer.toString(score));
+            }
+            else
+                update_score(score);
+            
             lengthofsnake++;
             xpos = random.nextInt(29);
             ypos = random.nextInt(21);
@@ -146,6 +204,27 @@ public class SnakeGame extends javax.swing.JFrame implements KeyListener, Action
             }
         }
     }
+    
+    public void update_score(int score)
+    {
+        try {
+            MySql msql = new MySql();
+            String sql = "update info set tempscore = '"+score+"' where userid = '"+Login.uid+"'";
+            PreparedStatement pstmt = msql.conn.prepareStatement(sql);
+            int i = pstmt.executeUpdate();
+            
+            if(i>0){
+                System.out.println("Successfully online ....!!!!");
+                scorebox.setText(Integer.toString(score));
+            }
+            else
+                System.out.println("Error to update score ....!!!!");
+            
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(SnakeGame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -157,9 +236,11 @@ public class SnakeGame extends javax.swing.JFrame implements KeyListener, Action
 
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        playstatusbox = new javax.swing.JTextField();
+        player1box = new javax.swing.JTextField();
+        scorebox2 = new javax.swing.JTextField();
         scorebox = new javax.swing.JTextField();
+        player2box = new javax.swing.JTextField();
         jPanel3 = new javax.swing.JPanel()
         {
             public void paint(Graphics g)
@@ -185,22 +266,43 @@ public class SnakeGame extends javax.swing.JFrame implements KeyListener, Action
         jPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(255, 153, 51), new java.awt.Color(255, 153, 51), new java.awt.Color(255, 153, 51), new java.awt.Color(255, 153, 51)));
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setFont(new java.awt.Font("HP Simplified Light", 1, 28)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(255, 153, 0));
-        jLabel1.setText("Snake Game");
-        jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 10, 170, 40));
+        playstatusbox.setEditable(false);
+        playstatusbox.setBackground(new java.awt.Color(0, 0, 0));
+        playstatusbox.setFont(new java.awt.Font("HP Simplified Light", 1, 30)); // NOI18N
+        playstatusbox.setForeground(new java.awt.Color(255, 153, 0));
+        playstatusbox.setBorder(null);
+        jPanel2.add(playstatusbox, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 10, 210, 40));
 
-        jLabel3.setFont(new java.awt.Font("HP Simplified Light", 1, 18)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(51, 255, 51));
-        jLabel3.setText("Score :");
-        jPanel2.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 20, 60, 20));
+        player1box.setEditable(false);
+        player1box.setBackground(new java.awt.Color(0, 0, 0));
+        player1box.setFont(new java.awt.Font("HP Simplified Light", 0, 18)); // NOI18N
+        player1box.setForeground(new java.awt.Color(51, 255, 0));
+        player1box.setText("userid ");
+        player1box.setBorder(null);
+        jPanel2.add(player1box, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 10, 90, 40));
 
+        scorebox2.setEditable(false);
+        scorebox2.setBackground(new java.awt.Color(0, 0, 0));
+        scorebox2.setFont(new java.awt.Font("HP Simplified Light", 0, 30)); // NOI18N
+        scorebox2.setForeground(new java.awt.Color(255, 255, 51));
+        scorebox2.setText("0");
+        scorebox2.setBorder(null);
+        jPanel2.add(scorebox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 10, 100, 40));
+
+        scorebox.setEditable(false);
         scorebox.setBackground(new java.awt.Color(0, 0, 0));
         scorebox.setFont(new java.awt.Font("HP Simplified Light", 0, 30)); // NOI18N
         scorebox.setForeground(new java.awt.Color(255, 255, 51));
         scorebox.setText("0");
         scorebox.setBorder(null);
         jPanel2.add(scorebox, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 10, 100, 40));
+
+        player2box.setEditable(false);
+        player2box.setBackground(new java.awt.Color(0, 0, 0));
+        player2box.setFont(new java.awt.Font("HP Simplified Light", 0, 18)); // NOI18N
+        player2box.setForeground(new java.awt.Color(51, 255, 0));
+        player2box.setBorder(null);
+        jPanel2.add(player2box, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 10, 90, 40));
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 750, 60));
 
@@ -275,13 +377,15 @@ public class SnakeGame extends javax.swing.JFrame implements KeyListener, Action
     private javax.swing.JLabel gameoverlabel;
     private javax.swing.JTextField highscorebox;
     private javax.swing.JLabel highscorelabel;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    public static javax.swing.JTextField player1box;
+    public static javax.swing.JTextField player2box;
+    public static javax.swing.JTextField playstatusbox;
     private javax.swing.JLabel restartmsglabel;
-    private javax.swing.JTextField scorebox;
+    public javax.swing.JTextField scorebox;
+    public static javax.swing.JTextField scorebox2;
     // End of variables declaration//GEN-END:variables
 
     @Override
